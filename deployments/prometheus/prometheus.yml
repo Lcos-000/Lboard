@@ -1,0 +1,11 @@
+#这是Prometheus的配置文件，用于定义要监控的指标和数据源
+global:
+  scrape_interval: 15s
+scrape_configs:
+  - job_name: "whiteboard-server"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets: ["whiteboard-server:8080"]
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]

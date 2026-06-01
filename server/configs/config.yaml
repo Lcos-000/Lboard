@@ -1,0 +1,45 @@
+# 默认配置
+# 常用于团队开发
+server:
+  # 服务器地址
+  addr: ":8080"
+  # Gin模式 
+  gin_mode: "debug"
+
+log:
+  # 日志级别
+  # 可选值：debug, info, warn, error, fatal
+  # 默认值：debug
+  level: "debug"
+  # 日志格式
+  # 可选值：console, json
+  # 默认值：console   
+  format: "console"
+
+postgres:
+  # 数据库连接字符串
+  # 用于连接PostgreSQL数据库  
+  dsn: "postgres://whiteboard:whiteboard@localhost:5432/whiteboard?sslmode=disable"
+
+redis:
+  addr: "localhost:6379"
+  # Redis密码
+  password: ""
+  # Redis数据库索引 
+  db: 0
+    
+minio:
+  # Minio端点
+  endpoint: "localhost:9000"
+  # Minio访问密钥
+  # 用于身份验证  
+  access_key: "minioadmin"
+  # Minio密钥
+  # 用于身份验证  
+  secret_key: "minioadmin"
+  # 是否使用SSL 
+  # 默认值：false
+  use_ssl: false
+  # Minio桶名
+  # 用于存储文件  
+  bucket: "whiteboard"

@@ -1,0 +1,309 @@
+推荐项目目录
+建议采用 Monorepo：
+
+TEXT
+whiteboard/                                          # 项目根目录
+├── README.md                                        # 项目说明文档
+├── docs/                                            # 项目文档
+├── deployments/                                     # 部署配置
+├── scripts/                                         # 开发运维脚本
+├── web/                                             # 前端应用（React + TypeScript）
+├── server/                                          # Go 后端服务
+├── wal-rust/                                        # 高性能 WAL 存储引擎（Rust）
+├── proto/                                           # protobuf 协议定义
+├── tests/                                           # 端到端/集成测试
+└── docker-compose.yml                               # 本地开发环境编排
+下面详细展开。
+
+3.1 顶层目录
+TEXT
+whiteboard/                                          # 项目根目录
+├── README.md                                        # 项目说明文档
+├── Makefile                                         # 项目构建/任务自动化
+├── docker-compose.yml                               # 本地开发环境容器编排
+├── .gitignore                                       # Git 忽略规则
+├── .env.example                                     # 环境变量模板
+├── docs/                                            # 项目文档目录
+│   ├── architecture.md                              # 系统架构设计文档
+│   ├── api.md                                       # HTTP API 接口文档
+│   ├── protocol.md                                  # WebSocket 通信协议文档
+│   ├── data-model.md                                # 数据模型设计文档
+│   ├── wal-design.md                                # WAL 预写日志设计文档
+│   ├── sync-design.md                               # 实时同步方案设计文档
+│   ├── performance-test.md                          # 性能测试报告
+│   └── interview-notes.md                           # 面试/设计要点笔记
+├── proto/                                           # protobuf 协议定义
+│   ├── operation.proto                              # 协作操作消息协议
+│   ├── room.proto                                   # 房间管理消息协议
+│   └── generated/                                   # proto 生成的代码
+├── scripts/                                         # 开发运维脚本
+│   ├── dev-up.sh                                    # 启动本地开发环境
+│   ├── dev-down.sh                                  # 停止本地开发环境
+│   ├── migrate.sh                                   # 数据库迁移脚本
+│   ├── seed.sh                                      # 种子数据填充
+│   ├── benchmark.sh                                 # 性能基准测试脚本
+│   └── kill-wal-test.sh                             # 强制终止 WAL 测试（模拟崩溃）
+├── deployments/                                     # 部署配置
+│   ├── docker/                                      # Docker 镜像构建配置
+│   ├── prometheus/                                  # Prometheus 监控配置
+│   │   └── prometheus.yml                           # Prometheus 采集规则
+│   ├── grafana/                                     # Grafana 可视化面板
+│   │   └── dashboards/                              # 自定义监控仪表盘
+│   └── k8s-optional/                                # Kubernetes 编排（可选）
+├── web/                                             # 前端应用目录
+├── server/                                          # Go 后端服务目录
+├── wal-rust/                                        # Rust WAL 引擎目录
+└── tests/                                           # 测试目录
+    ├── e2e/                                         # 端到端测试
+    ├── load/                                        # 负载/压力测试
+    └── recovery/                                    # 崩溃恢复测试
+3.2 前端目录
+TEXT
+web/                                                 # 前端应用根目录（React + TypeScript + Vite）
+├── package.json                                     # 前端依赖与脚本配置
+├── pnpm-lock.yaml                                   # pnpm 依赖锁文件
+├── vite.config.ts                                   # Vite 构建配置
+├── tsconfig.json                                    # TypeScript 编译配置
+├── index.html                                       # 入口 HTML
+├── public/                                          # 静态资源（不经过构建）
+├── src/                                             # 前端源码目录
+│   ├── main.tsx                                     # 应用入口，挂载 React
+│   ├── App.tsx                                      # 根组件，路由分发
+│   ├── routes/                                      # 页面路由定义
+│   │   ├── index.tsx                                # 路由配置汇总
+│   │   ├── LoginPage.tsx                            # 登录页面
+│   │   ├── RegisterPage.tsx                         # 注册页面
+│   │   ├── DashboardPage.tsx                        # 控制台/白板列表页
+│   │   └── BoardPage.tsx                            # 白板编辑页（核心页面）
+│   ├── components/                                  # 通用 UI 组件
+│   │   ├── layout/                                  # 布局组件（侧边栏、顶栏等）
+│   │   ├── toolbar/                                 # 工具栏组件（画笔、形状等）
+│   │   ├── panels/                                  # 面板组件（属性面板、层叠面板等）
+│   │   └── common/                                  # 通用基础组件（按钮、输入框等）
+│   ├── whiteboard/                                  # 白板核心引擎相关
+│   │   ├── canvas/                                  # Canvas 渲染引擎
+│   │   │   ├── CanvasEngine.ts                      # Canvas 引擎主类，管理渲染循环
+│   │   │   ├── LayerManager.ts                      # 图层管理，多图层叠加与排序
+│   │   │   ├── RenderScheduler.ts                   # 渲染调度器，控制帧率与重绘
+│   │   │   ├── Camera.ts                            # 视口相机，平移/缩放变换
+│   │   │   ├── HitTester.ts                         # 点击命中检测，拾取元素
+│   │   │   └── SpatialIndex.ts                      # 空间索引，加速碰撞与区域查询
+│   │   ├── elements/                                # 白板元素定义
+│   │   │   ├── Element.ts                           # 元素基类，定义公共属性和接口
+│   │   │   ├── RectangleElement.ts                  # 矩形元素
+│   │   │   ├── EllipseElement.ts                    # 椭圆/圆形元素
+│   │   │   ├── PathElement.ts                       # 路径/自由笔迹元素
+│   │   │   ├── TextElement.ts                       # 文字元素
+│   │   │   └── renderers/                           # 各类元素的自定义渲染器
+│   │   ├── tools/                                   # 交互工具（用户操作模式）
+│   │   │   ├── Tool.ts                              # 工具基类，定义工具接口
+│   │   │   ├── SelectTool.ts                        # 选择工具，框选/点选/拖拽
+│   │   │   ├── RectTool.ts                          # 矩形绘制工具
+│   │   │   ├── PenTool.ts                           # 自由笔迹/画笔工具
+│   │   │   ├── TextTool.ts                          # 文字输入工具
+│   │   │   └── PanTool.ts                           # 平移/拖拽画布工具
+│   │   ├── operations/                              # 协作操作（OT/CRDT 核心）
+│   │   │   ├── Operation.ts                         # 操作基类，定义操作结构
+│   │   │   ├── OperationFactory.ts                  # 操作工厂，从消息反序列化为操作
+│   │   │   ├── OperationApplier.ts                  # 操作执行器，将操作应用到画布状态
+│   │   │   ├── OperationQueue.ts                    # 操作队列，管理待发送/待确认操作
+│   │   │   └── UndoRedoManager.ts                   # 撤销/重做管理器
+│   │   ├── sync/                                    # 实时同步模块
+│   │   │   ├── WebSocketClient.ts                   # WebSocket 客户端连接管理
+│   │   │   ├── ReconnectManager.ts                  # 自动重连策略管理器
+│   │   │   ├── ProtocolCodec.ts                     # 协议编解码（二进制/JSON）
+│   │   │   └── SyncManager.ts                       # 同步状态管理器，协调操作收发
+│   │   └── store/                                   # 状态管理（Zustand）
+│   │       ├── boardStore.ts                        # 画布全局状态（元素列表、视图等）
+│   │       ├── selectionStore.ts                    # 选中状态管理
+│   │       ├── presenceStore.ts                     # 在线协作者光标/选中状态
+│   │       └── userStore.ts                         # 当前用户信息状态
+│   ├── api/                                         # HTTP API 客户端
+│   │   ├── http.ts                                  # axios 实例封装，拦截器配置
+│   │   ├── auth.ts                                  # 认证相关 API（登录、注册、刷新）
+│   │   ├── rooms.ts                                 # 房间管理 API（创建、加入、列表）
+│   │   └── files.ts                                 # 文件导出/导入 API
+│   ├── types/                                       # TypeScript 类型定义
+│   │   ├── room.ts                                  # 房间相关类型
+│   │   ├── user.ts                                  # 用户相关类型
+│   │   └── operation.ts                             # 操作相关类型
+│   └── utils/                                       # 工具函数
+│       ├── uuid.ts                                  # 唯一 ID 生成器
+│       ├── throttle.ts                              # 节流/防抖工具函数
+│       └── logger.ts                                # 前端日志工具
+└── tests/                                           # 前端单元/集成测试
+    ├── canvas/                                      # Canvas 引擎测试
+    ├── operations/                                  # 操作相关测试
+    └── sync/                                        # 同步模块测试
+3.3 Go 后端目录
+推荐使用比较清晰的分层目录：
+
+TEXT
+server/                                              # Go 后端服务根目录
+├── go.mod                                           # Go 模块依赖定义
+├── go.sum                                           # Go 依赖校验锁文件
+├── cmd/                                             # 可执行程序入口
+│   ├── whiteboard-server/                           # 主服务入口
+│   │   └── main.go                                  # 服务启动 main 函数
+│   └── tools/                                       # 辅助工具入口
+│       ├── wal-replay/                              # WAL 回放工具，用于数据恢复
+│       │   └── main.go
+│       └── loadgen/                                 # 负载生成器，用于性能测试
+│           └── main.go
+├── configs/                                         # 配置文件
+│   ├── config.yaml                                  # 默认配置文件
+│   └── config.local.yaml                            # 本地开发覆盖配置（不入 Git）
+├── internal/                                        # 内部业务逻辑（不对外导出）
+│   ├── app/                                         # 应用启动与依赖注入
+│   │   ├── app.go                                   # 应用主结构体，协调各模块启动
+│   │   ├── wire.go                                  # Wire 依赖注入声明
+│   │   └── lifecycle.go                             # 应用生命周期管理（启动/停止/优雅退出）
+│   ├── config/                                      # 配置加载模块
+│   │   └── config.go                                # 配置结构体定义与加载
+│   ├── http/                                        # HTTP 层
+│   │   ├── router.go                                # 路由注册，绑定 handler 与中间件
+│   │   ├── middleware/                              # HTTP 中间件
+│   │   │   ├── auth.go                              # JWT 认证中间件
+│   │   │   ├── cors.go                              # 跨域中间件
+│   │   │   ├── logging.go                           # 请求日志中间件
+│   │   │   └── recovery.go                          # Panic 恢复中间件
+│   │   └── handlers/                                # HTTP 处理器
+│   │       ├── auth_handler.go                      # 认证相关接口（登录、注册、刷新令牌）
+│   │       ├── room_handler.go                      # 房间管理接口（CRUD、成员管理）
+│   │       ├── file_handler.go                      # 文件导入导出接口
+│   │       └── health_handler.go                    # 健康检查接口
+│   ├── websocket/                                   # WebSocket 连接管理
+│   │   ├── gateway.go                               # WebSocket 网关，统一管理连接生命周期
+│   │   ├── connection.go                            # 单个连接封装，读写管理
+│   │   ├── hub.go                                   # 连接 Hub，管理所有活跃连接
+│   │   ├── message.go                               # WebSocket 消息结构定义
+│   │   ├── writer.go                                # 写协程，批量写消息到连接
+│   │   ├── reader.go                                # 读协程，从连接读取消息
+│   │   ├── heartbeat.go                             # 心跳检测，保活与超时断开
+│   │   └── backpressure.go                          # 背压控制，防止写堆积
+│   ├── room/                                        # 房间管理（Actor 模型）
+│   │   ├── manager.go                               # 房间管理器，创建/查找/销毁房间
+│   │   ├── actor.go                                 # 房间 Actor，处理房间内消息
+│   │   ├── event.go                                 # 房间事件定义（成员加入/离开等）
+│   │   ├── state.go                                 # 房间状态管理
+│   │   ├── broadcast.go                             # 房间内消息广播
+│   │   ├── lifecycle.go                             # 房间生命周期（创建、活跃、销毁）
+│   │   ├── gc.go                                    # 空闲房间垃圾回收
+│   │   └── recovery.go                              # 房间崩溃恢复
+│   ├── collab/                                      # 协作引擎（OT/CRDT 操作处理）
+│   │   ├── operation.go                             # 操作定义与序列化
+│   │   ├── operation_type.go                        # 操作类型枚举与注册
+│   │   ├── applier.go                               # 操作执行器，将操作应用到文档状态
+│   │   ├── validator.go                             # 操作合法性校验
+│   │   ├── conflict.go                              # 冲突检测与解决
+│   │   ├── dedup.go                                 # 操作去重，防止重复应用
+│   │   ├── versioned_field.go                       # 带版本号的字段，支持并发控制
+│   │   ├── tombstone.go                             # 墓碑机制，处理元素删除同步
+│   │   └── undo.go                                  # 撤销/重做逻辑
+│   ├── snapshot/                                    # 快照管理（定期持久化画布状态）
+│   │   ├── snapshot.go                              # 快照结构定义
+│   │   ├── manager.go                               # 快照管理器，创建/加载/清理快照
+│   │   ├── codec.go                                 # 快照编解码（序列化/反序列化）
+│   │   ├── manifest.go                              # 快照清单，记录索引与元信息
+│   │   └── minio_store.go                           # MinIO 对象存储适配
+│   ├── wal/                                         # WAL 预写日志（Go 实现，可对接 Rust）
+│   │   ├── wal.go                                   # WAL 接口定义
+│   │   ├── record.go                                # WAL 记录结构
+│   │   ├── codec.go                                 # WAL 记录编解码
+│   │   ├── file_wal.go                              # 文件型 WAL 实现
+│   │   ├── segment.go                               # WAL 段文件管理
+│   │   ├── recovery.go                              # WAL 回放恢复
+│   │   ├── checksum.go                              # 校验和，保证数据完整性
+│   │   └── rust_client.go                           # Rust WAL 引擎的 Go 客户端
+│   ├── protocol/                                    # 通信协议编解码
+│   │   ├── codec.go                                 # 协议编解码接口
+│   │   ├── json_codec.go                            # JSON 协议实现
+│   │   ├── proto_codec.go                           # Protobuf 协议实现
+│   │   └── message.go                               # 协议消息结构体
+│   ├── auth/                                        # 认证与授权
+│   │   ├── jwt.go                                   # JWT 令牌签发与验证
+│   │   ├── password.go                              # 密码哈希与校验（bcrypt）
+│   │   ├── permission.go                            # 权限校验逻辑
+│   │   └── service.go                               # 认证服务，组合认证流程
+│   ├── repository/                                  # 数据访问层（Repository 模式）
+│   │   ├── db.go                                    # 数据库连接初始化与事务管理
+│   │   ├── user_repo.go                             # 用户数据访问
+│   │   ├── room_repo.go                             # 房间数据访问
+│   │   ├── member_repo.go                           # 房间成员数据访问
+│   │   ├── snapshot_repo.go                         # 快照元数据访问
+│   │   └── file_repo.go                             # 文件记录数据访问
+│   ├── model/                                       # 数据模型定义（数据库映射）
+│   │   ├── user.go                                  # 用户模型
+│   │   ├── room.go                                  # 房间模型
+│   │   ├── member.go                                # 房间成员模型
+│   │   ├── file.go                                  # 文件记录模型
+│   │   └── snapshot.go                              # 快照元数据模型
+│   ├── service/                                     # 业务逻辑层
+│   │   ├── auth_service.go                          # 认证业务逻辑
+│   │   ├── room_service.go                          # 房间业务逻辑
+│   │   ├── file_service.go                          # 文件业务逻辑
+│   │   └── user_service.go                          # 用户业务逻辑
+│   ├── storage/                                     # 对象存储抽象
+│   │   ├── minio.go                                 # MinIO 客户端初始化
+│   │   └── object_store.go                          # 对象存储接口定义
+│   ├── redis/                                       # Redis 集成
+│   │   ├── client.go                                # Redis 客户端初始化
+│   │   ├── limiter.go                               # 基于 Redis 的限流器
+│   │   └── presence.go                              # 基于 Redis 的在线状态管理
+│   ├── observability/                               # 可观测性（三大支柱）
+│   │   ├── logger.go                                # 结构化日志（zerolog/zap）
+│   │   ├── metrics.go                               # Prometheus 指标采集
+│   │   ├── tracing.go                               # 分布式追踪（OpenTelemetry）
+│   │   └── middleware.go                            # 可观测性中间件集成
+│   └── errors/                                      # 错误处理
+│       ├── code.go                                  # 错误码定义
+│       └── errors.go                                # 自定义错误类型与包装
+├── migrations/                                      # 数据库迁移脚本
+│   ├── 001_init_users.sql                           # 用户表初始化
+│   ├── 002_init_rooms.sql                           # 房间表初始化
+│   ├── 003_init_snapshots.sql                       # 快照表初始化
+│   └── 004_init_files.sql                           # 文件表初始化
+├── pkg/                                             # 可复用的公共工具包
+│   ├── uuid/                                        # UUID 生成器
+│   ├── clock/                                       # 时钟接口（可注入，方便测试）
+│   └── retry/                                       # 重试工具
+└── tests/                                           # 服务端测试
+    ├── integration/                                 # 集成测试
+    ├── room/                                        # 房间模块测试
+    ├── wal/                                         # WAL 模块测试
+    ├── collab/                                      # 协作引擎测试
+    └── websocket/                                   # WebSocket 模块测试
+3.4 Rust WAL 目录，可选高级模块
+TEXT
+wal-rust/                                            # 高性能 WAL 引擎（Rust 实现，可选）
+├── Cargo.toml                                       # Rust 项目依赖与配置
+├── README.md                                        # Rust 模块说明文档
+├── src/                                             # 源码目录
+│   ├── main.rs                                      # Rust 服务入口
+│   ├── config.rs                                    # 配置加载
+│   ├── server/                                      # 本地通信服务（Unix Socket）
+│   │   ├── mod.rs                                   # 模块声明
+│   │   ├── unix_socket.rs                           # Unix Domain Socket 监听
+│   │   ├── protocol.rs                              # 通信协议定义
+│   │   └── handler.rs                               # 请求处理器
+│   ├── wal/                                         # WAL 核心引擎
+│   │   ├── mod.rs                                   # 模块声明
+│   │   ├── engine.rs                                # WAL 引擎主逻辑
+│   │   ├── record.rs                                # WAL 记录结构
+│   │   ├── segment.rs                               # 段文件管理
+│   │   ├── writer.rs                                # 写入器（高性能顺序写入）
+│   │   ├── reader.rs                                # 读取器（顺序扫描回放）
+│   │   ├── recovery.rs                              # 崩溃恢复逻辑
+│   │   ├── checksum.rs                              # 校验和计算与验证
+│   │   └── group_commit.rs                          # 组提交优化，批量刷盘
+│   ├── snapshot/                                    # 快照清单管理
+│   │   └── manifest.rs                              # 快照清单序列化与解析
+│   ├── metrics/                                     # 性能指标采集
+│   │   └── mod.rs                                   # 指标定义与暴露
+│   └── error.rs                                     # 错误类型定义
+├── benches/                                         # 基准测试
+│   └── wal_bench.rs                                 # WAL 写入/读取性能基准
+└── tests/                                           # 集成测试
+    ├── append_recover_test.rs                       # 追加写入后回放恢复测试
+    ├── crash_recover_test.rs                        # 模拟崩溃后恢复测试
+    └── checksum_test.rs                             # 校验和完整性测试

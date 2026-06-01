@@ -1,0 +1,12 @@
+apiVersion: 1
+# 这是Grafana的官方指定的目录结构，用于定义数据源的配置文件
+datasources:
+  - name: Prometheus
+    # 这是Prometheus的类型，用于在Grafana中使用Prometheus的指标
+    type: prometheus
+    # 这是Prometheus的访问模式，用于在Grafana中使用Prometheus的指标
+    access: proxy
+    # 这是Prometheus的URL，用于获取指标数据
+    url: http://prometheus:9090
+    # 这是默认的数据源，用于在Grafana中使用Prometheus的指标
+    isDefault: true
