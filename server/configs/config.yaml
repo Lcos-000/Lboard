@@ -16,6 +16,13 @@ log:
   # 默认值：console   
   format: "console"
 
+auth:
+  # JWT密钥
+  jwt_secret: "dev-secret-change-me"
+  # 访问令牌过期时间
+  access_token_ttl: "24h"
+
+
 postgres:
   # 数据库连接字符串
   # 用于连接PostgreSQL数据库  

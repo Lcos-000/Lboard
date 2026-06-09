@@ -86,6 +86,10 @@ services:
       WB_MINIO_SECRET_KEY: "minioadmin"
       WB_MINIO_USE_SSL: "false"
       WB_MINIO_BUCKET: "whiteboard"
+
+      WB_AUTH_JWT_SECRET: "dev-secret-change-me"
+      WB_AUTH_ACCESS_TOKEN_TTL: "24h"
+
     ports:
       - "8080:8080"
     # 等待PostgreSQL、Redis和MinIO启动完成

@@ -3,21 +3,23 @@ package httpapi
 import (
 	"time"
 
+	"whiteboard/server/internal/auth"
 	"whiteboard/server/internal/http/handlers"
+	"whiteboard/server/internal/http/middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 )
 
-// RouterDeps 路由依赖项，结构体注入
-// 注意这里没有NewRouterDeps函数所以在使用NewRouter的时候要手动组装结构体
 type RouterDeps struct {
 	Logger        *zap.Logger
+	JWTManager    *auth.JWTManager
 	HealthHandler *handlers.HealthHandler
+	AuthHandler   *handlers.AuthHandler
+	RoomHandler   *handlers.RoomHandler
 }
 
-// NewRouter 创建HTTP路由
 func NewRouter(deps RouterDeps) *gin.Engine {
 	r := gin.New()
 
@@ -28,10 +30,24 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 	r.GET("/readyz", deps.HealthHandler.Readyz)
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
+	api := r.Group("/api/v1")
+
+	api.POST("/auth/register", deps.AuthHandler.Register)
+	api.POST("/auth/login", deps.AuthHandler.Login)
+
+	protected := api.Group("")
+	protected.Use(middleware.AuthRequired(deps.JWTManager))
+
+	protected.GET("/auth/me", deps.AuthHandler.Me)
+
+	protected.POST("/rooms", deps.RoomHandler.CreateRoom)
+	protected.GET("/rooms", deps.RoomHandler.ListRooms)
+	protected.GET("/rooms/:roomId", deps.RoomHandler.GetRoom)
+	protected.POST("/rooms/:roomId/members", deps.RoomHandler.InviteMember)
+
 	return r
 }
 
-// accessLogMiddleware 访问日志中间件
 func accessLogMiddleware(logger *zap.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		start := time.Now()

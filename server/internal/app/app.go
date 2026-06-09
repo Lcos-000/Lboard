@@ -6,9 +6,12 @@ import (
 	"net/http"
 	"time"
 
+	"whiteboard/server/internal/auth"
 	"whiteboard/server/internal/config"
 	httpapi "whiteboard/server/internal/http"
 	"whiteboard/server/internal/http/handlers"
+	"whiteboard/server/internal/repository"
+	"whiteboard/server/internal/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -55,6 +58,11 @@ func New(ctx context.Context, cfg *config.Config, logger *zap.Logger) (*App, err
 		_ = redisClient.Close()
 		return nil, err
 	}
+
+	if err := repository.EnsureSchema(ctx, pgPool); err != nil {
+		pgPool.Close()
+		return nil, err
+	}
 	// 初始化MinIO连接
 	minioClient, err := minio.New(cfg.MinIO.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(cfg.MinIO.AccessKey, cfg.MinIO.SecretKey, ""),
@@ -78,10 +86,24 @@ func New(ctx context.Context, cfg *config.Config, logger *zap.Logger) (*App, err
 		minioClient,
 		cfg.MinIO.Bucket,
 	)
+	jwtManager := auth.NewJWTManager(cfg.Auth.JWTSecret, cfg.Auth.AccessTokenTTL)
+
+	userRepo := repository.NewUserRepository(pgPool)
+	roomRepo := repository.NewRoomRepository(pgPool)
+
+	authService := service.NewAuthService(userRepo, jwtManager)
+	roomService := service.NewRoomService(roomRepo, userRepo)
+
+	authHandler := handlers.NewAuthHandler(authService)
+	roomHandler := handlers.NewRoomHandler(roomService)
+
 	// 初始化HTTP路由
 	router := httpapi.NewRouter(httpapi.RouterDeps{
 		Logger:        logger,
+		JWTManager:    jwtManager,
 		HealthHandler: healthHandler,
+		AuthHandler:   authHandler,
+		RoomHandler:   roomHandler,
 	})
 	// 初始化HTTP服务器
 	httpServer := &http.Server{

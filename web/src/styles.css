@@ -29,6 +29,7 @@ input {
   min-height: 100vh;
 }
 
+
 .app-header {
   height: 56px;
   padding: 0 24px;
@@ -132,3 +133,56 @@ input {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
 }
+
+.error-text {
+  color: #dc2626;
+  font-size: 14px;
+}
+
+.success-text {
+  color: #16a34a;
+  font-size: 14px;
+}
+
+.muted {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.create-room-form {
+  margin-top: 24px;
+  display: grid;
+  gap: 12px;
+  max-width: 420px;
+}
+
+.create-room-form input,
+.invite-form input,
+.invite-form select {
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.create-room-form button,
+.invite-form button {
+  height: 38px;
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  background: #2563eb;
+  cursor: pointer;
+}
+
+.invite-form {
+  display: grid;
+  gap: 8px;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #e5e7eb;
+  margin: 16px 0;
+}
+

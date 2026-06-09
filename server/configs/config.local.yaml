@@ -15,6 +15,12 @@ log:
   # 可选值：console, json
   # 默认值：console
   format: "console"
+# 认证配置
+auth:
+  # JWT密钥
+  jwt_secret: "dev-secret-change-me"
+  # 访问令牌过期时间
+  access_token_ttl: "24h"
 # 数据库配置
 postgres:
   # 数据库连接字符串

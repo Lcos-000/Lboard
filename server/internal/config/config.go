@@ -2,6 +2,7 @@ package config
 
 import (
 	"strings"
+	"time"
 
 	"github.com/spf13/viper"
 )
@@ -11,8 +12,14 @@ type Config struct {
 	Server   ServerConfig   `mapstructure:"server"`
 	Log      LogConfig      `mapstructure:"log"`
 	Postgres PostgresConfig `mapstructure:"postgres"`
+	Auth     AuthConfig     `mapstructure:"auth"`
 	Redis    RedisConfig    `mapstructure:"redis"`
 	MinIO    MinIOConfig    `mapstructure:"minio"`
+}
+
+type AuthConfig struct {
+	JWTSecret      string        `mapstructure:"jwt_secret"`
+	AccessTokenTTL time.Duration `mapstructure:"access_token_ttl"`
 }
 
 // ServerConfig 服务器配置结构体
@@ -54,7 +61,6 @@ type MinIOConfig struct {
 }
 
 // Load 加载配置文件
-// 从指定路径加载配置文件，或默认路径加载配置文件
 func Load(configPath string) (*Config, error) {
 	// 创建Viper实例
 	v := viper.New()
@@ -74,8 +80,8 @@ func Load(configPath string) (*Config, error) {
 	} else {
 		// 设置默认配置文件名和类型
 		v.SetConfigName("config")
-		v.SetConfigName("config")
 		v.SetConfigType("yaml")
+		//在没有指定配置文件路径时，默认从当前目录、上一级目录、应用根目录加载配置文件，从上到下找，找到了就停止
 		v.AddConfigPath("./configs")
 		v.AddConfigPath("../configs")
 		v.AddConfigPath("/app/configs")
@@ -92,6 +98,12 @@ func Load(configPath string) (*Config, error) {
 	if err := v.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
+	if cfg.Auth.JWTSecret == "" {
+		cfg.Auth.JWTSecret = "dev-secret-change-me"
+	}
+	if cfg.Auth.AccessTokenTTL <= 0 {
+		cfg.Auth.AccessTokenTTL = 24 * time.Hour
+	}
 	// 返回解析后的配置
 	return &cfg, nil
 }
@@ -104,6 +116,9 @@ func setDefaults(v *viper.Viper) {
 
 	v.SetDefault("log.level", "debug")
 	v.SetDefault("log.format", "console")
+
+	v.SetDefault("auth.jwt_secret", "dev-secret-change-me")
+	v.SetDefault("auth.access_token_ttl", "24h")
 
 	v.SetDefault("postgres.dsn", "postgres://whiteboard:whiteboard@localhost:5432/whiteboard?sslmode=disable")
 
