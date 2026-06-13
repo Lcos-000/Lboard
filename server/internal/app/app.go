@@ -12,6 +12,7 @@ import (
 	"whiteboard/server/internal/http/handlers"
 	"whiteboard/server/internal/repository"
 	"whiteboard/server/internal/service"
+	ws "whiteboard/server/internal/websocket"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -97,6 +98,16 @@ func New(ctx context.Context, cfg *config.Config, logger *zap.Logger) (*App, err
 	authHandler := handlers.NewAuthHandler(authService)
 	roomHandler := handlers.NewRoomHandler(roomService)
 
+	wsHub := ws.NewHub(10000)
+	wsHandler := ws.NewDefaultMessageHandler(roomService, logger)
+	wsGateway := ws.NewGateway(
+		wsHub,
+		jwtManager,
+		roomService,
+		wsHandler,
+		logger,
+	)
+
 	// 初始化HTTP路由
 	router := httpapi.NewRouter(httpapi.RouterDeps{
 		Logger:        logger,
@@ -104,7 +115,9 @@ func New(ctx context.Context, cfg *config.Config, logger *zap.Logger) (*App, err
 		HealthHandler: healthHandler,
 		AuthHandler:   authHandler,
 		RoomHandler:   roomHandler,
+		WSGateway:     wsGateway,
 	})
+
 	// 初始化HTTP服务器
 	httpServer := &http.Server{
 		Addr:              cfg.Server.Addr,

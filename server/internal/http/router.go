@@ -6,6 +6,7 @@ import (
 	"whiteboard/server/internal/auth"
 	"whiteboard/server/internal/http/handlers"
 	"whiteboard/server/internal/http/middleware"
+	ws "whiteboard/server/internal/websocket"
 
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -18,6 +19,7 @@ type RouterDeps struct {
 	HealthHandler *handlers.HealthHandler
 	AuthHandler   *handlers.AuthHandler
 	RoomHandler   *handlers.RoomHandler
+	WSGateway     *ws.Gateway
 }
 
 func NewRouter(deps RouterDeps) *gin.Engine {
@@ -29,6 +31,7 @@ func NewRouter(deps RouterDeps) *gin.Engine {
 	r.GET("/healthz", deps.HealthHandler.Healthz)
 	r.GET("/readyz", deps.HealthHandler.Readyz)
 	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
+	r.GET("/ws", deps.WSGateway.HandleWebSocket)
 
 	api := r.Group("/api/v1")
 
