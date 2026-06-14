@@ -1,188 +1,72 @@
-* {
-  box-sizing: border-box;
+.ws-panel {
+  display: grid;
+  gap: 10px;
 }
 
-body {
-  margin: 0;
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
-  color: #172033;
-  background: #f5f7fb;
-}
-
-a {
-  color: #2563eb;
-  text-decoration: none;
-}
-
-button,
-input {
-  font: inherit;
-}
-
-.app {
-  min-height: 100vh;
-}
-
-
-.app-header {
-  height: 56px;
-  padding: 0 24px;
+.ws-panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
 }
 
-.brand {
-  font-size: 20px;
-  font-weight: 700;
-  color: #111827;
+.ws-status {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  background: #e5e7eb;
+  color: #374151;
 }
 
-.nav {
-  display: flex;
-  gap: 16px;
+.ws-status-connected {
+  background: #dcfce7;
+  color: #166534;
 }
 
-.app-main {
-  padding: 24px;
+.ws-status-connecting,
+.ws-status-reconnecting {
+  background: #fef3c7;
+  color: #92400e;
 }
 
-.page-card {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 24px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+.ws-status-error {
+  background: #fee2e2;
+  color: #991b1b;
 }
 
-.form {
-  margin-top: 20px;
+.ws-status-closed,
+.ws-status-idle {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.ws-actions {
   display: grid;
-  gap: 12px;
-  max-width: 320px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
 }
 
-.form input {
-  height: 40px;
-  padding: 0 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-}
-
-.form button {
-  height: 40px;
+.ws-actions button {
+  height: 32px;
   border: none;
-  border-radius: 8px;
-  color: #ffffff;
-  background: #2563eb;
-}
-
-.room-list {
-  margin-top: 24px;
-  display: grid;
-  gap: 16px;
-}
-
-.room-card {
-  padding: 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-}
-
-.board-page {
-  height: calc(100vh - 104px);
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 16px;
-}
-
-.toolbar {
-  padding: 16px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-}
-
-.toolbar button {
-  width: 100%;
-  height: 36px;
-  margin-bottom: 8px;
-}
-
-.board-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  background:
-    linear-gradient(#eef2ff 1px, transparent 1px),
-    linear-gradient(90deg, #eef2ff 1px, transparent 1px),
-    #ffffff;
-  background-size: 24px 24px;
-
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-}
-
-.error-text {
-  color: #dc2626;
-  font-size: 14px;
-}
-
-.success-text {
-  color: #16a34a;
-  font-size: 14px;
-}
-
-.muted {
-  color: #6b7280;
-  font-size: 13px;
-}
-
-.create-room-form {
-  margin-top: 24px;
-  display: grid;
-  gap: 12px;
-  max-width: 420px;
-}
-
-.create-room-form input,
-.invite-form input,
-.invite-form select {
-  height: 38px;
-  padding: 0 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-}
-
-.create-room-form button,
-.invite-form button {
-  height: 38px;
-  border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   color: #ffffff;
   background: #2563eb;
   cursor: pointer;
 }
 
-.invite-form {
+.ws-messages {
+  max-height: 240px;
+  overflow: auto;
   display: grid;
   gap: 8px;
 }
 
-hr {
-  border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 16px 0;
+.ws-messages pre {
+  margin: 0;
+  padding: 8px;
+  overflow: auto;
+  font-size: 11px;
+  color: #e5e7eb;
+  background: #111827;
+  border-radius: 8px;
 }
-

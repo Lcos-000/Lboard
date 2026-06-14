@@ -1,10 +1,15 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { getRoom, inviteMember, type Room } from '../api/rooms';
+import WSStatusPanel from '../WSStatusPanel';
+import { getRoom, inviteMember, type Room } from '../../api/rooms';
+import { wsClient } from '../../ws/WebSocketClient';
+import { useAppStore } from '../../store/appStore';
 
 export default function BoardPage() {
   const { roomId } = useParams();
+
+  const pushWSMessage = useAppStore((state) => state.pushWSMessage);
 
   const [room, setRoom] = useState<Room | null>(null);
   const [inviteEmail, setInviteEmail] = useState('bob@example.com');
@@ -26,6 +31,37 @@ export default function BoardPage() {
   useEffect(() => {
     void loadRoom();
   }, [roomId]);
+
+  useEffect(() => {
+    if (!roomId) return;
+
+    wsClient.connect();
+
+    const offStatus = wsClient.onStatus(async (status) => {
+      if (status !== 'connected') return;
+
+      try {
+        const ack = await wsClient.request({
+          type: 'join_room',
+          roomId
+        });
+
+        pushWSMessage(ack);
+      } catch (err) {
+        pushWSMessage({
+          type: 'client_error',
+          roomId,
+          payload: {
+            message: err instanceof Error ? err.message : 'join room failed'
+          }
+        });
+      }
+    });
+
+    return () => {
+      offStatus();
+    };
+  }, [roomId, pushWSMessage]);
 
   async function handleInvite(e: FormEvent) {
     e.preventDefault();
@@ -87,12 +123,17 @@ export default function BoardPage() {
 
         {message && <p className="success-text">{message}</p>}
         {error && <p className="error-text">{error}</p>}
+
+        <hr />
+
+        <WSStatusPanel />
       </aside>
 
       <div className="board-placeholder">
         <h1>白板页面占位</h1>
-        <p>Phase 1：已完成房间权限校验。</p>
-        <p>Phase 2 才会接入 WebSocket。</p>
+        <p>Phase 2：WebSocket Gateway 已接入。</p>
+        <p>当前阶段已支持连接、鉴权、心跳、自动重连、join room。</p>
+        <p>Phase 3 才会接入 Room Actor 和房间内广播。</p>
       </div>
     </section>
   );

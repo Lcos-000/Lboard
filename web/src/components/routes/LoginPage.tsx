@@ -1,14 +1,13 @@
 import { FormEvent, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import { register } from '../api/auth';
-import { useAppStore } from '../store/appStore';
+import { login } from '../../api/auth';
+import { useAppStore } from '../../store/appStore';
 
-export default function RegisterPage() {
+export default function LoginPage() {
   const navigate = useNavigate();
   const setUser = useAppStore((state) => state.setUser);
 
-  const [username, setUsername] = useState('alice');
   const [email, setEmail] = useState('alice@example.com');
   const [password, setPassword] = useState('123456');
   const [error, setError] = useState('');
@@ -21,16 +20,11 @@ export default function RegisterPage() {
     setError('');
 
     try {
-      const result = await register({
-        username,
-        email,
-        password
-      });
-
+      const result = await login({ email, password });
       setUser(result.user);
       navigate('/dashboard');
     } catch (err) {
-      setError(err instanceof Error ? err.message : '注册失败');
+      setError(err instanceof Error ? err.message : '登录失败');
     } finally {
       setLoading(false);
     }
@@ -38,16 +32,10 @@ export default function RegisterPage() {
 
   return (
     <section className="page-card">
-      <h1>注册</h1>
-      <p>创建一个新用户。</p>
+      <h1>登录</h1>
+      <p>使用已注册账号登录。</p>
 
       <form className="form" onSubmit={handleSubmit}>
-        <input
-          placeholder="用户名"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-
         <input
           placeholder="邮箱"
           value={email}
@@ -55,7 +43,7 @@ export default function RegisterPage() {
         />
 
         <input
-          placeholder="密码，至少 6 位"
+          placeholder="密码"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -64,9 +52,10 @@ export default function RegisterPage() {
         {error && <p className="error-text">{error}</p>}
 
         <button type="submit" disabled={loading}>
-          {loading ? '注册中...' : '注册'}
+          {loading ? '登录中...' : '登录'}
         </button>
       </form>
     </section>
   );
 }
+

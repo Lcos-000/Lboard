@@ -1,9 +1,9 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-import { createRoom, listRooms, type Room } from '../api/rooms';
-import { me } from '../api/auth';
-import { useAppStore } from '../store/appStore';
+import { createRoom, listRooms, type Room } from '../../api/rooms';
+import { me } from '../../api/auth';
+import { useAppStore } from '../../store/appStore';
 
 export default function DashboardPage() {
   const appName = useAppStore((state) => state.appName);

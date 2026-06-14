@@ -1,9 +1,9 @@
 import { Link, Navigate, Route, Routes } from 'react-router-dom';
 
-import LoginPage from './routes/LoginPage';
-import RegisterPage from './routes/RegisterPage';
-import DashboardPage from './routes/DashboardPage';
-import BoardPage from './routes/BoardPage';
+import LoginPage from './components/routes/LoginPage';
+import RegisterPage from './components/routes/RegisterPage';
+import DashboardPage from './components/routes/DashboardPage';
+import BoardPage from './components/routes/BoardPage';
 
 export default function App() {
   return (
