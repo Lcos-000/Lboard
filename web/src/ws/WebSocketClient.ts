@@ -17,6 +17,28 @@ export class WebSocketClient {
   private statusListeners = new Set<StatusListener>();
 
   connect() {
+    // 如果已经连接或正在连接中，不重复创建
+    if (this.ws) {
+        if (this.ws.readyState === WebSocket.OPEN) {
+        console.log('WebSocket already connected, skip');
+        return;
+        }
+        if (this.ws.readyState === WebSocket.CONNECTING) {
+        console.log('WebSocket already connecting, skip');
+        return;
+        }
+        // readyState 是 CLOSING 或 CLOSED 时，继续往下走，重新连接
+    }
+    
+    // 清理 pending 请求
+    this.rejectAllPending(new Error('重新连接'));
+    
+    // 清除重连定时器
+    if (this.reconnectTimer !== null) {
+        window.clearTimeout(this.reconnectTimer);
+        this.reconnectTimer = null;
+    }
+
     const token = getToken();
 
     if (!token) {
