@@ -98,6 +98,7 @@ func New(ctx context.Context, cfg *config.Config, logger *zap.Logger) (*App, err
 	authHandler := handlers.NewAuthHandler(authService)
 	roomHandler := handlers.NewRoomHandler(roomService)
 
+	// 初始化WebSocket连接网关
 	wsHub := ws.NewHub(10000)
 	wsHandler := ws.NewDefaultMessageHandler(roomService, logger)
 	wsGateway := ws.NewGateway(
