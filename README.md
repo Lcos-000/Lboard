@@ -1,4 +1,4 @@
-# WebSocket 通信服务(v0.2.0)
+# WebSocket 通信服务(v0.2.0)(demo)
 
 基于 `gorilla/websocket` 实现的实时通信层，为协作编辑提供双向消息推送能力。
 
